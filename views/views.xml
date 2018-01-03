@@ -1,0 +1,299 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="stock_barcode_rule.list">
+      <field name="name">stock_barcode_rule list</field>
+      <field name="model">stock.barcode.rule</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="stock_barcode_rule_forms">
+      <field name="name">stock_barcode_rule forms</field>
+      <field name="model">stock.barcode.rule</field>
+      <field name="arch" type="xml">
+        <form>
+	    <sheet>
+	<group>
+          <field name="name"/>
+          <field name="length"/>
+          <field name="re"/>
+          <field name="product_start"/>
+          <field name="product_end"/>
+          <field name="weight_start"/>
+          <field name="weight_end"/>
+	</group>
+	<group>
+          <field name="partner_id"/>
+          <field name="product_id"/>
+          <field name="partner_code"/>
+	  <field name="local_code"/>
+
+	</group>
+	</sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="stock_barcode_rule.action_window">
+      <field name="name">stock_barcode_rule window</field>
+      <field name="res_model">stock.barcode.rule</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem name="供应商条码" id="stock_barcode_rule.menu_1_list" parent="stock.menu_stock_inventory_control"
+              action="stock_barcode_rule.action_window"/>
+
+        <record id="view_partner_stock_barcode_form" model="ir.ui.view">
+        <field name="name">res.partner.stock.barcode</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+	<field name="lang" position = "after">
+	<field name="barcode_rule"/>
+	<field name="batch_code"/>
+	</field>
+        </field>
+    </record>
+
+        <record id="view_partner_stock_move_form" model="ir.ui.view">
+        <field name="name">stock.barcode.move</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_form"/>
+        <field name="arch" type="xml">
+        <field name="product_id" position = "after">
+        <field name="product_uom_weight"/>
+        </field>
+        </field>
+    </record>
+        <record id="view_pack_operation_form" model="ir.ui.view">
+        <field name="name">stock.pack_operatione</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_details_form"/>
+        <field name="arch" type="xml">
+        <field name="product_id" position = "after">
+	<field name="picking_id"/>
+        <field name="all_real_received"/>
+	<field name="call_weight"/>
+	<field name="code" invisible= '1'/>
+
+        <field name="pack_lot_ids" attrs="{'invisible':[('code','=','incoming')]}">
+        <tree class ="my_custom_class">
+	<field name="lot_id"/>
+        <field name="should_received"/>
+        <field name="demaged_received"/>
+        </tree>
+        </field>
+
+        <field name="pack_lot_ids_copy" attrs="{'invisible': [('code','!=','incoming')]}">
+        <tree class ="my_custom_class">
+        <field name="lot_name"/>
+        <field name="should_received"/>
+        <field name="demaged_received"/>
+        </tree>
+        </field>
+
+        </field>
+        </field>
+    </record>
+        <record id="view_partner_stock_move_tree" model="ir.ui.view">
+        <field name="name">stock.barcode.move</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+        <field name="arch" type="xml">
+        <field name="product_uom" position = "after">
+        <field name="product_uom_weight"/>
+        </field>
+        </field>
+    </record>
+
+        <record id="view_stock_barcode_rule_form" model="ir.ui.view">
+        <field name="name">res.stock.barcode_rule</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+	<xpath expr="//button[@name='do_print_picking']" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </xpath>
+        <xpath expr="//button[@name='do_print_picking']" position="after">
+	<button name="do_print_picking" string="打印预收单" groups="stock.group_stock_user" type="object" attrs="{'invisible': ['|',('state','in',('done','draft')),('picking_type_code', '!=', 'incoming')]}"/>
+        </xpath>
+        <xpath expr="//button[@name='do_print_picking']" position="after">
+        <button name="do_print_picking" string="打印拣货单" groups="stock.group_stock_user" type="object"  attrs="{'invisible': ['|',('state','in',('done','draft')),('picking_type_code', '=', 'incoming')]}"/>
+        </xpath>
+        <xpath expr="//button[@name='do_print_picking']" position="after">
+        <button name="%(stock.action_report_delivery)d" string="打印收货单" groups="stock.group_stock_user" type="action" attrs="{'invisible': ['|',('state','!=','done'),('picking_type_code','!=','incoming')]}"/>
+        </xpath>
+        <xpath expr="//button[@name='do_print_picking']" position="after">
+        <button name="%(stock.action_report_delivery)d" string="打印出库单" groups="stock.group_stock_user" type="action" attrs="{'invisible': ['|',('state','not in',('done')),('picking_type_code', '=', 'incoming')]}"/>
+        </xpath>
+	<xpath expr="//button[@name='do_print_picking']" position="after">
+        <button name="%(stock.action_report_delivery)d" string="打印托运单" groups="stock.group_stock_user" type="action" attrs="{'invisible': ['|',('state','not in',('done')),('picking_type_code', '=', 'incoming')]}"/>
+        </xpath>
+
+	<xpath expr="//button[@name='action_confirm']" position="after">
+	<button name="action_confirm" states="draft" string="Mark asdfasdf" type="object" class="oe_highlight" groups="stock.group_stock_user"/>
+        </xpath>
+        <xpath expr="//button[@name='do_new_transfer']" position="after">
+	<button name="do_new_transfer" states="draft,partially_available,assigned" string="证明" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+        </xpath>
+        <xpath expr="//button[@name='action_confirm']" position="after">
+        <button name="action_confirm" states="draft,partially_available,assigned" string="你好" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+        </xpath>
+
+
+	<field name="location_id" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </field>
+        <field name="location_dest_id" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </field>
+        <field name="origin" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </field>
+        <field name="partner_id" position="after">
+        <field name="origin"/>
+	<field name="owner"/>
+	<field name="batch_code" attrs = "{'invisible':[('picking_type_code','!=','incoming'),('financial_state','=','draft')]}"/>
+	<field name="min_date_copy"/>
+	<field name="financial_state"  attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
+        </field>
+        <field name="min_date" position = "after">
+        <field name="should_received"/>
+	<field name="real_received"/>
+        <field name="demaged_received"/>
+        <field name="should_sum_uom"/>
+        <field name="real_sum_uom"/>
+        <field name="orders_name" invisible = "1"/>
+	<field name="barcode_rule" invisible = "1"/>
+        </field>
+	<field name="min_date" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </field>
+	<field name="picking_type_id" position = "after">
+        <field name="location_id"/>
+        <field name="location_dest_id"/>
+        </field>
+
+        </field>
+    </record>
+        <record id="view_stock_barcode_picking_rule_form" model="ir.ui.view">
+        <field name="name">res.stock.operation</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>
+        <field name="arch" type="xml">
+        <field name="product_id" position = "after">
+	<field name="picking_id"/>
+        <field name="all_should_received" invisible = "1"/>
+        <field name="all_real_received" invisible = "1"/>
+	<field name="call_weight" invisible = "1"/>
+        <field name="all_demaged_received" invisible = "1"/>
+        <field name="real_all_sum_uom" invisible = "1"/>
+	<field name="no_tips_weight" invisible = "1"/>
+	<field name="no_tips_qty" invisible = "1"/>
+	<field name="no_tips_product" invisible = "1"/>
+	<field name="no_tips_partner" invisible = "1"/>
+        </field>
+
+	<field name="product_id" position="attributes">
+        <attribute name = "invisible">1</attribute>
+        </field>
+	<field name = "plus_visible" position = "after">
+	<field name="should_received"/>
+	<field name="demaged_received"/>
+	<field name="real_received" invisible="1"/>
+	</field>
+        </field>
+    </record>
+
+        <record id="view_stock_production_lot_rule_form" model="ir.ui.view">
+        <field name="name">stock.production.operation</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+        <field name="ref" position = "after">
+		    <field name="lock"/>
+		    <field name="partner_id"/>
+		    <field name="stock_picking_id"/>
+		    <field name="create_date"/>
+                    <field name="real_received"/>
+                    <field name="should_received"/>
+                    <field name="demaged_received"/>
+                    <field name="real_send"/>
+                    <field name="should_send"/>
+		    <field name="batch_code_line"/>
+		    <field name="product_state"/>
+		    <field name="location_id"/>
+        </field>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_barcode_rule_batch_code_tree">
+      <field name="name">batchcode list</field>
+      <field name="model">batch.code</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="stock_batch_code_forms">
+      <field name="name">stock_barcode_rule forms</field>
+      <field name="model">batch.code</field>
+      <field name="arch" type="xml">
+        <form>
+	<header>
+	<button string="全部锁定" name="lock_all" type="object" class="oe_highlight"/>
+	<button string="全部解锁" name="unlock_all" type="object" class="oe_highlight"/>
+	</header>
+      <sheet>
+        <group>
+          <field name="name"/>
+	  <field name="owner"/>
+	  <field name="state"/>
+	  <field name="stock_production_lot_id">
+	  <tree editable  = "top">
+	  <field name ="lock"/>
+	  <field name ="name"/>
+	  <field name ="product_id"/>
+	  <field name ="product_qty"/>
+	  <field name ="create_date"/>
+	  </tree>
+	  </field>
+	  <field name="auto_delect"/>
+        </group>
+        </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="stock_barcode_rule.action_window_batch">
+      <field name="name">批次号</field>
+      <field name="res_model">batch.code</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem name="批次号" id="stock_barcode_rule.batch_code_menuitem" parent="stock.menu_stock_inventory_control"
+              action="stock_barcode_rule.action_window_batch"/>
+   
+    <record model="ir.actions.act_window" id="stock_barcode_rule.action_window_wizard">
+      <field name="name">批次号</field>
+      <field name="res_model">stock.barcode.wizard</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_brcode_rule_wizard">
+      <field name="name">stock_barcode_wizard forms</field>
+      <field name="model">stock.barcode.wizard</field>
+      <field name="arch" type="xml">
+        <form>
+      <sheet>
+        <group>
+          <field name="weight"/>
+        </group>
+        </sheet>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</odoo>

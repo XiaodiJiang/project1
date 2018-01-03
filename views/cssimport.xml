@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="my_custom_class" name="My custom CSS"  inherit_id="web.assets_backend">
+           <xpath expr="." position="inside">
+              <link href="/stock_barcode_rule/static/src/less/my_file.less" rel="stylesheet"/>
+           </xpath>
+      </template>
+
+    </data>
+</odoo>
+
